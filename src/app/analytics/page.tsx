@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getJobStats } from "@/lib/jobs";
 import { UserCircle, Building2, CheckCircle2, Calendar, Ban } from "lucide-react";
 
-
+export const dynamic = 'force-dynamic';
 export default async function AnalyticsPage() {
   const { totalJobs, totalInterviews, totalOffers, recentApplications, totalRejections } = await getJobStats();
 
