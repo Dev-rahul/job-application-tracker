@@ -27,8 +27,9 @@ export async function GET() {
       },
     });
     return NextResponse.json(jobs);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch jobs' }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to fetch jobs';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -54,7 +55,8 @@ export async function POST(request: Request) {
       },
     });
     return NextResponse.json(job);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to create job' }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to create job';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

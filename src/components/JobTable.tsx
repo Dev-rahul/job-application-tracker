@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Job } from "@prisma/client";
+import { type Job } from "@/types/job";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { StatusDropdown } from "./StatusDropdown";
