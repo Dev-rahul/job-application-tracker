@@ -1,10 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getJobStats } from "@/lib/jobs";
-import { UserCircle, Building2, CheckCircle2, Calendar } from "lucide-react";
+import { UserCircle, Building2, CheckCircle2, Calendar, Ban } from "lucide-react";
 
 
 export default async function AnalyticsPage() {
-  const { totalJobs, totalInterviews, totalOffers, recentApplications } = await getJobStats();
+  const { totalJobs, totalInterviews, totalOffers, recentApplications, totalRejections } = await getJobStats();
 
   const stats = [
     {
@@ -13,6 +13,13 @@ export default async function AnalyticsPage() {
       icon: UserCircle,
       description: "Total number of jobs applied",
       color: "bg-blue-100 text-blue-800",
+    },
+    {
+      title: "Rejections",
+      value: totalRejections,
+      icon: Ban,
+      description: "Rejected applications",
+      color: "bg-red-100 text-red-800",
     },
     {
       title: "Active Interviews",
@@ -28,6 +35,7 @@ export default async function AnalyticsPage() {
       description: "Received job offers",
       color: "bg-green-100 text-green-800",
     },
+     
     {
       title: "Recent Applications",
       value: recentApplications,

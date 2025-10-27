@@ -6,13 +6,19 @@ export async function getJobStats() {
 
   const totalInterviews = await db.job.count({
     where: {
-      status: "Interviewing"
+      status: "Interview"
     }
   });
 
   const totalOffers = await db.job.count({
     where: {
-      status: "Offered"
+      status: "Offer"
+    }
+  });
+
+  const totalRejections = await db.job.count({
+    where: {
+      status: "Rejected"
     }
   });
 
@@ -29,6 +35,7 @@ export async function getJobStats() {
     totalJobs,
     totalInterviews,
     totalOffers,
-    recentApplications
+    recentApplications,
+    totalRejections
   };
 }
