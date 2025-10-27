@@ -1,0 +1,29 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Job {
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  title        String
+  company      String
+  location     String?
+  salaryMin    Float?
+  salaryMax    Float?
+  workType     String?   @default("onsite") // can be "remote", "hybrid", or "onsite"
+  currency     String?   @default("GBP")
+  url          String
+  dateApplied  DateTime  @default(now())
+  status       String    @default("Applied")
+  notes        String?
+  tags         String?
+}

@@ -1,0 +1,200 @@
+'use client';
+
+'use client';
+
+import { JobTable } from "@/components/JobTable";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { AddJobForm } from "@/components/AddJobForm";
+import { useEffect, useState } from "react";
+
+interface Job {
+  id: number;
+  title: string;
+  company: string;
+  url: string;
+  dateApplied: Date;
+  status: string;
+  notes?: string | null;
+  tags?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export default function HomePage() {
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/jobs')
+      .then(res => res.json())
+      .then(data => setJobs(data))
+      .catch(error => console.error('Error fetching jobs:', error));
+  }, []);
+
+  const handleAddJob = async (data: any) => {
+    try {
+      const response = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) throw new Error('Failed to add job');
+      
+      const newJob = await response.json();
+      setJobs([newJob, ...jobs]);
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error adding job:', error);
+    }
+  };
+
+  const handleStatusChange = async (jobId: number, newStatus: string) => {
+    try {
+      const response = await fetch(`/api/jobs/${jobId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus, id: jobId }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update status');
+
+      setJobs(jobs.map(job => 
+        job.id === jobId ? { ...job, status: newStatus } : job
+      ));
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
+  return (
+    <main className="container mx-auto py-10 space-y-8">
+      <div className="flex justify-between items-center">
+        <h1 className="text-4xl font-bold">Job Applications</h1>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button>Add New Job</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Add New Job Application</DialogTitle>
+            </DialogHeader>
+            <AddJobForm onSubmit={handleAddJob} />
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <JobTable
+        jobs={jobs}
+        onStatusChange={handleStatusChange}
+      />
+    </main>
+  );
+}
+
+  return (
+    <main className="container mx-auto py-10 space-y-8">
+      <div className="flex justify-between items-center">
+        <h1 className="text-4xl font-bold">Job Applications</h1>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>Add New Job</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Add New Job Application</DialogTitle>
+            </DialogHeader>
+            <AddJobForm
+              onSubmit={async (data) => {
+                'use server';
+                await prisma.job.create({
+                  data: {
+                    ...data,
+                    dateApplied: new Date(),
+                  },
+                });
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <JobTable
+        jobs={jobs}
+        onStatusChange={async (jobId, newStatus) => {
+          'use server';
+          await prisma.job.update({
+            where: { id: jobId },
+            data: { status: newStatus },
+          });
+        }}
+      />
+    </main>
+  );
+}
+          width={100}
+          height={20}
+          priority
+        />
+        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
+          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
+            To get started, edit the page.tsx file.
+          </h1>
+          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
+            Looking for a starting point or more instructions? Head over to{" "}
+            <a
+              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+              className="font-medium text-zinc-950 dark:text-zinc-50"
+            >
+              Templates
+            </a>{" "}
+            or the{" "}
+            <a
+              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+              className="font-medium text-zinc-950 dark:text-zinc-50"
+            >
+              Learning
+            </a>{" "}
+            center.
+          </p>
+        </div>
+        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+          <a
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
+            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              className="dark:invert"
+              src="/vercel.svg"
+              alt="Vercel logomark"
+              width={16}
+              height={16}
+            />
+            Deploy Now
+          </a>
+          <a
+            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
+            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Documentation
+          </a>
+        </div>
+      </main>
+    </div>
+  );
+}
