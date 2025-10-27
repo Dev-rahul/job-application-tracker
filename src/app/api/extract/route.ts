@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { chromium } from 'playwright';
+import chromium from '@sparticuz/chromium-min';
+import puppeteer from 'puppeteer-core';
 
 export async function POST(request: Request) {
   let browser;
@@ -23,11 +24,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Launch browser with debugging options
+    // Launch browser with chromium-min
     console.log('Initializing browser...');
-    browser = await chromium.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
     });
     const context = await browser.newContext({
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
