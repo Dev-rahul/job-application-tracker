@@ -26,19 +26,35 @@ export async function POST(request: Request) {
 
     // Launch browser with chromium-min
     console.log('Initializing browser...');
+    
+    // Configure chromium for both local and Vercel environments
+    if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+      // Running on Vercel
+      await chromium.font('https://raw.githack.com/googlei18n/noto-emoji/master/fonts/NotoColorEmoji.ttf');
+    } else {
+      // Local development - use local Chrome
+      process.env.CHROME_PATH = process.platform === 'win32'
+        ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+        : process.platform === 'darwin'
+        ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        : '/usr/bin/google-chrome';
+    }
+
     browser = await puppeteer.launch({
       args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true,
+      defaultViewport: {
+        width: 1920,
+        height: 1080
+      },
+      executablePath: process.env.AWS_LAMBDA_FUNCTION_VERSION
+        ? await chromium.executablePath()
+        : process.env.CHROME_PATH,
+      headless: true
     });
-    const context = await browser.newContext({
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      viewport: { width: 1920, height: 1080 },
-      bypassCSP: true // Bypass Content Security Policy
-    });
-    const page = await context.newPage();
+
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    await page.setBypassCSP(true);
 
     try {
       console.log('Navigating to URL...');
@@ -58,8 +74,8 @@ export async function POST(request: Request) {
 
           // Wait for either the network to be idle or a timeout
           await Promise.race([
-            page.waitForLoadState('networkidle', { timeout: 10000 }),
-            page.waitForTimeout(15000)
+            page.waitForNetworkIdle({ timeout: 10000 }),
+            new Promise(resolve => setTimeout(resolve, 15000))
           ]).catch(() => {
             console.log('Network idle timeout reached, continuing anyway...');
           });
@@ -74,7 +90,7 @@ export async function POST(request: Request) {
           }
           
           // Exponential backoff before retrying
-          await page.waitForTimeout(2000 * Math.pow(2, retryCount - 1));
+          await new Promise(resolve => setTimeout(resolve, 2000 * Math.pow(2, retryCount - 1)));
         }
       }
 
@@ -91,7 +107,7 @@ export async function POST(request: Request) {
         if (closeButton) {
           console.log('Found popup, attempting to close...');
           await closeButton.click();
-          await page.waitForTimeout(1000); // Wait for popup animation
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for popup animation
         }
       } catch {
         console.log('No popup found or unable to close popup');
