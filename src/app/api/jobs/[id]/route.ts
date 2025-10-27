@@ -4,13 +4,13 @@ import prisma from '@/lib/prisma';
 // PATCH /api/jobs/[id]
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const data = await request.json();
     const job = await prisma.job.update({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(context.params.id),
       },
       data,
     });
@@ -22,13 +22,13 @@ export async function PATCH(
 
 // DELETE /api/jobs/[id]
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  _request: Request,
+  context: { params: { id: string } }
 ) {
   try {
     await prisma.job.delete({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(context.params.id),
       },
     });
     return NextResponse.json({ message: 'Job deleted successfully' });
