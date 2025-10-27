@@ -7,24 +7,24 @@ type RouteContext = {
   };
 };
 
-// PATCH /api/jobs/[id]
-export async function PATCH(
-  request: NextRequest,
-  { params }: RouteContext
-) {
-  try {
-    const data = await request.json();
-    const job = await prisma.job.update({
-      where: {
-        id: parseInt(params.id),
-      },
-      data,
-    });
-    return NextResponse.json(job);
-  } catch {
-    return NextResponse.json({ error: 'Failed to update job' }, { status: 500 });
-  }
-}
+// // PATCH /api/jobs/[id]
+// export async function PATCH(
+//   request: NextRequest,
+//   { params }: RouteContext
+// ) {
+//   try {
+//     const data = await request.json();
+//     const job = await prisma.job.update({
+//       where: {
+//         id: parseInt(params.id),
+//       },
+//       data,
+//     });
+//     return NextResponse.json(job);
+//   } catch {
+//     return NextResponse.json({ error: 'Failed to update job' }, { status: 500 });
+//   }
+// }
 
 // // DELETE /api/jobs/[id]
 // export async function DELETE(
