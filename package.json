@@ -7,7 +7,7 @@
     "build": "prisma generate && next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate && npx playwright install chromium"
+    "postinstall": "prisma generate && npx playwright install-deps && npx playwright install chromium"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
