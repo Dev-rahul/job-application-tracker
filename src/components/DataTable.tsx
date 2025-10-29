@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ColumnDef,
   SortingState,
@@ -15,13 +17,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends { id: number }, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id: number }, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -58,6 +61,7 @@ export function DataTable<TData, TValue>({
                   </div>
                 </TableHead>
               ))}
+              <TableHead className="py-4 w-12" />
             </TableRow>
           ))}
         </TableHeader>
@@ -67,13 +71,41 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="hover:bg-slate-50/70"
+                className="hover:bg-slate-50/70 "
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-4">
+                  <TableCell key={cell.id} className="py-4 max-w-96 truncate">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
+                <TableCell className="py-4 w-12">
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label="Delete job"
+                    title="Delete job"
+                    onClick={async () => {
+                      const id = (row.original as { id: number }).id;
+                      const confirmed = window.confirm("Delete this job?");
+                      if (!confirmed) return;
+                      try {
+                        const res = await fetch(`/api/jobs/${id}`, { method: "DELETE" });
+                        if (!res.ok) {
+                          const err = await res.json().catch(() => ({}));
+                          throw new Error(err.error || "Failed to delete job");
+                        }
+                        if (window.refreshJobs) {
+                          window.refreshJobs();
+                        }
+                      } catch (error) {
+                        console.error("Error deleting job:", error);
+                        alert("Failed to delete. Please try again.");
+                      }
+                    }}
+                  >
+                    ×
+                  </Button>
+                </TableCell>
               </TableRow>
             ))
           ) : (
