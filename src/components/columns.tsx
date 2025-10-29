@@ -15,11 +15,11 @@ export const columns: ColumnDef<SortableJob>[] = [
       return format(new Date(date), 'MMM dd, yyyy');
     },
   },
-  {
-    id: "postedAgo",
-    header: "Posted Ago",
-    cell: ({ row }) => row.original.postedAgo || "-",
-  },
+  // {
+  //   id: "postedAgo",
+  //   header: "Posted Ago",
+  //   cell: ({ row }) => row.original.postedAgo || "-",
+  // },
   {
     accessorKey: "title",
     header: "Job Title",
