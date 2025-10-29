@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { SortableJob } from "@/types/job";
-import { format } from "date-fns";
+import { format, formatDistanceStrict } from "date-fns";
 import { StatusDropdown } from "./StatusDropdown";
 import Link from "next/link";
 
@@ -14,6 +14,11 @@ export const columns: ColumnDef<SortableJob>[] = [
       const date = row.original.dateApplied;
       return format(new Date(date), 'MMM dd, yyyy');
     },
+  },
+  {
+    id: "postedAgo",
+    header: "Posted Ago",
+    cell: ({ row }) => row.original.postedAgo || "-",
   },
   {
     accessorKey: "title",
@@ -57,6 +62,25 @@ export const columns: ColumnDef<SortableJob>[] = [
       const a = rowA.original.salaryMin || 0;
       const b = rowB.original.salaryMin || 0;
       return a > b ? 1 : a < b ? -1 : 0;
+    },
+  },
+  {
+    id: "appliedSpeed",
+    header: "Applied Speed",
+    cell: ({ row }) => {
+      const applied = new Date(row.original.dateApplied);
+      const postedAt = row.original.postedAt ? new Date(row.original.postedAt) : undefined;
+      if (!postedAt) return "-";
+      return formatDistanceStrict(postedAt, applied, { addSuffix: false });
+    },
+    sortingFn: (a, b) => {
+      const aPosted = a.original.postedAt ? new Date(a.original.postedAt).getTime() : Infinity;
+      const bPosted = b.original.postedAt ? new Date(b.original.postedAt).getTime() : Infinity;
+      const aApplied = new Date(a.original.dateApplied).getTime();
+      const bApplied = new Date(b.original.dateApplied).getTime();
+      const aDelta = aApplied - aPosted;
+      const bDelta = bApplied - bPosted;
+      return (aDelta || Infinity) - (bDelta || Infinity);
     },
   },
   {

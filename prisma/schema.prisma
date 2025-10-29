@@ -26,4 +26,13 @@ model Job {
   status       String    @default("Applied")
   notes        String?
   tags         String?
+  // New optional fields from scraper
+  companyDescription String?
+  companyLogo        String?
+  dateExtracted      DateTime?
+  postedAgo          String?
+  postedAt           DateTime?
+  followers          String?
+  jobType            String?
+  description        String?
 }
